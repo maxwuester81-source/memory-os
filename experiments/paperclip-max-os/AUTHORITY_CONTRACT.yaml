@@ -1,0 +1,45 @@
+version: "0.1"
+name: MAX_OS_AUTHORITY_CONTRACT
+authority_order:
+  - id: runtime_evidence
+    scope: current_runtime_state
+    priority: 100
+  - id: drive_canon
+    scope: durable_project_truth
+    priority: 90
+  - id: max_os_current_state
+    scope: derived_operational_state
+    priority: 80
+  - id: verified_external_source
+    scope: version_sensitive_external_fact
+    priority: 75
+  - id: memory_os
+    scope: retrieval_and_prior_context
+    priority: 60
+  - id: paperclip
+    scope: work_state_only
+    priority: 30
+  - id: agent_context
+    scope: transient_reasoning_context
+    priority: 10
+
+freshness_states:
+  - CURRENT
+  - STALE
+  - UNKNOWN
+  - CONFLICT
+  - SUPERSEDED
+
+record_states:
+  - PROPOSED
+  - VERIFIED
+  - CANONICAL
+  - SUPERSEDED
+  - CONFLICT
+
+rules:
+  - "Paperclip state MUST NOT become canonical knowledge."
+  - "memory-os retrieval MUST preserve source/provenance when available."
+  - "A retrieved memory MUST NOT override newer canonical evidence solely because it was injected."
+  - "CONFLICT MUST fail closed for consequential writes."
+  - "CANONICAL writes require the canonical-writer path and applicable approval."
