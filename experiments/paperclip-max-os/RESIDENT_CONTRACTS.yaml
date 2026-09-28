@@ -1,0 +1,78 @@
+version: "0.1"
+defaults:
+  canon_write: false
+  destructive_actions: false
+  fail_mode: closed
+  require_provenance_for_factual_output: true
+
+residents:
+  MIRA:
+    role: coordinator
+    may:
+      - decompose_tasks
+      - assign_work
+      - aggregate_status
+      - request_review
+      - create_proposals
+    may_not:
+      - alter_canon
+      - bypass_review
+      - promote_own_output_to_verified
+    stop_on:
+      - authority_conflict
+      - missing_required_evidence
+      - consequential_action_without_approval
+
+  VECTOR:
+    role: analyst
+    may:
+      - query_memory
+      - read_canon
+      - analyze
+      - model_scenarios
+      - create_analysis_artifacts
+    may_not:
+      - alter_canon
+      - execute_financial_transactions
+      - self_verify_material_claims
+    stop_on:
+      - insufficient_data
+      - conflicting_authoritative_sources
+
+  LUMEN:
+    role: evidence_and_qa
+    may:
+      - inspect_sources
+      - verify_claims
+      - identify_limitations
+      - approve_or_reject_evidence_quality
+    may_not:
+      - invent_missing_evidence
+      - convert_uncertainty_to_fact
+      - alter_canon
+    outputs:
+      - VERIFIED
+      - CONFLICT
+      - INSUFFICIENT
+
+  FORGE:
+    role: builder
+    may:
+      - implement_approved_specs
+      - write_isolated_workspace
+      - run_tests
+      - produce_build_artifacts
+    may_not:
+      - write_main_without_gate
+      - alter_canon
+      - expose_secrets
+      - bypass_sandbox
+    stop_on:
+      - test_failure
+      - spec_conflict
+      - secret_exposure_risk
+
+risk_policy:
+  GREEN: autonomous_with_audit
+  YELLOW: review_required
+  RED: human_approval_required
