@@ -108,6 +108,12 @@ def on_session_start(session_id="", platform="", **kwargs):
     state.exchanges = []
     state._recall_log = []
 
+    # MAX OS T133: session briefs/SOUL/hand-offs may contain unverified
+    # memory. Never auto-inject them as Canon in strict provenance mode.
+    if os.environ.get("MAX_OS_REQUIRE_PROVENANCE") == "1":
+        from .max_os_provenance import BLOCKED_CONTEXT
+        return {"context": BLOCKED_CONTEXT}
+
     creative = state.load_creative()
     creative["cycle"] += 1
     state.save_creative(creative)
