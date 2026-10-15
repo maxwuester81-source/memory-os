@@ -1,0 +1,22 @@
+name: MAX OS provenance gate
+on:
+  pull_request:
+    paths:
+      - "icarus/max_os_provenance.py"
+      - "icarus/hooks.py"
+      - "icarus/tools.py"
+      - "tests/test_max_os_provenance.py"
+      - ".github/workflows/max-os-provenance.yml"
+  workflow_dispatch:
+jobs:
+  provenance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Syntax check
+        run: python -m compileall -q icarus
+      - name: Provenance checks
+        run: python -m unittest discover -s tests -p 'test_max_os_provenance.py' -v
