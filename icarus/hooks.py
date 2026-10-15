@@ -361,6 +361,22 @@ def pre_llm_call(session_id="", user_message="", is_first_turn=False, **kwargs):
     if not user_message:
         return None
 
+    # MAX OS T133: no provenance-free fabric/Qdrant/session injection.
+    # Only a trusted runtime-supplied Canon resolver can unlock source excerpts.
+    if os.environ.get("MAX_OS_REQUIRE_PROVENANCE") == "1":
+        from .max_os_provenance import verify_retrieval, BLOCKED_CONTEXT
+        resolver = kwargs.get("canon_resolver")
+        if not callable(resolver):
+            return {"context": BLOCKED_CONTEXT}
+        try:
+            hits = state.recall(user_message, max_results=5,
+                                agent=state.AGENT_NAME or "agent")
+            gate = verify_retrieval(hits, resolver)
+        except Exception:
+            logger.exception("MAX OS provenance adapter blocked a retrieval")
+            return {"context": BLOCKED_CONTEXT}
+        return {"context": gate["context"]}
+
     tokens = _tokenize(user_message)
     if not tokens:
         return None
