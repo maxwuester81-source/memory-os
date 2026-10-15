@@ -1,6 +1,7 @@
 """Tool handlers — the code that runs when the LLM calls each tool."""
 
 import json
+import os
 from . import state
 
 
@@ -19,6 +20,11 @@ def fabric_recall(args: dict, **kwargs) -> str:
             agent=args.get("agent"),
             project=args.get("project"),
         )
+        if os.environ.get("MAX_OS_REQUIRE_PROVENANCE") == "1":
+            from .max_os_provenance import verify_retrieval
+            gate = verify_retrieval(results, kwargs.get("canon_resolver"))
+            # Do not leak raw memory entries or self-claimed verification flags.
+            return _json({"query": query, **gate})
         return _json({"query": query, "count": len(results), "entries": results})
     except Exception as e:
         return _json({"error": str(e)})
